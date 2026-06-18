@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
 
 project(ojph_capi
-    VERSION 0.1.0
+    VERSION 0.0.0
     DESCRIPTION "C shim over OpenJPH for cffi ABI-mode binding"
     LANGUAGES CXX C
 )
@@ -23,25 +23,10 @@ endif()
 
 # ---------------------------------------------------------------------------
 # OpenJPH via add_subdirectory (git submodule at ./OpenJPH)
-#
-# Key flags:
-#   OJPH_BUILD_EXECUTABLES  OFF  — we don't need ojph_compress / ojph_expand
-#   BUILD_SHARED_LIBS       OFF  — build OpenJPH as a static library so we
-#                                  can fold it into our single .so
-#
-# v0.26.0 note: the source-tree header directory was renamed from "common"
-# to "openjph", fixing the add_subdirectory include-path mismatch.  We
-# therefore require v0.26.0 or later (submodule should be pinned there or
-# newer).
 # ---------------------------------------------------------------------------
 set(OJPH_BUILD_EXECUTABLES OFF CACHE BOOL "" FORCE)
 set(OJPH_BUILD_TESTS       OFF CACHE BOOL "" FORCE)
-
-# Preserve the caller's BUILD_SHARED_LIBS, but force OpenJPH itself static.
-set(_saved_shared ${BUILD_SHARED_LIBS})
-set(BUILD_SHARED_LIBS OFF)
 add_subdirectory(OpenJPH)
-set(BUILD_SHARED_LIBS ${_saved_shared})
 
 # ---------------------------------------------------------------------------
 # Our C-shim shared library
@@ -58,26 +43,9 @@ target_sources(ojph_capi PUBLIC
 )
 
 # OpenJPH's CMake target is called "openjph" (lowercase).
-# Linking PRIVATE means OpenJPH symbols are NOT re-exported from our .so,
-# but because OpenJPH is static they are folded in.
+# Linking PRIVATE means OpenJPH symbols are NOT re-exported from our .so.
 target_link_libraries(ojph_capi PRIVATE openjph)
 
-# ---------------------------------------------------------------------------
-# Include paths
-#
-# After v0.26.0 the public headers live at:
-#   OpenJPH/src/core/openjph/   (in-source-tree name matches install name)
-#
-# The openjph CMake target already propagates these via INTERFACE_INCLUDE_
-# DIRECTORIES, so the target_link_libraries above is usually sufficient.
-# We add an explicit fallback in case the propagation isn't set up yet
-# in the version you're pinned to.
-# ---------------------------------------------------------------------------
-target_include_directories(ojph_capi PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/OpenJPH/src/core/openjph
-    # pre-v0.26.0 fallback (harmless if the directory doesn't exist):
-    ${CMAKE_CURRENT_SOURCE_DIR}/OpenJPH/src/core/common
-)
 
 # ---------------------------------------------------------------------------
 # Compiler options

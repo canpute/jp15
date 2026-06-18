@@ -17,16 +17,16 @@ par of faster than turbojpeg (so I've heard).
 
 ## Technical details
 
-This wrapper uses cffi to hook into the popular [openjph](https://github.com/aous72/OpenJPH)
-library. Since cffi requires a C API, while openjpg is C++, this project
-also implements a C-API for using openjph. The advantage of using cffi
-is that the resuling binary wheels work on a wide range of Python versions,
+This wrapper uses cffi to hook into the popular [OpenJPH](https://github.com/aous72/OpenJPH)
+library. Since cffi requires a C API and OpenJPH is C++, this project
+also implements a C-API on top of OpenJPH. The advantage of using cffi
+is that the resulting binary wheels work on a wide range of Python versions,
 including future versions and alternative Python implementations like Pypy.
 
 
 ## Installation
 
-Binary wheels are provided via Pypi, just use your favourite tool to install:
+Binary wheels are provided via Pypi, just use your favorite tool to install:
 ```
 pip install jp15
 ```
@@ -34,9 +34,11 @@ pip install jp15
 
 ## Developers
 
+Note that this repo has OpenJPH included as a submodule.
+
 Installation:
 ```
-git clone ..
+git clone --recurse-submodules <jp15-repo-url>
 cd jp15
 pip install -e .
 ```
